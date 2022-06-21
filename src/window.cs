@@ -1,9 +1,15 @@
 using System;
 using Raylib_cs;
+using System.Globalization;
+using System.Numerics;
 
 namespace thinking_box_12 {
     class window {
-        color stroke = new color(0,0,0);
+        color istroke = new color(0,0,0);
+        color ifill = new color(0,0,0);
+        
+        bool dfill = true;
+        bool dstroke = true;
 
         public void init(int w,int h,string title,string icon,bool ires) {
             if (ires) {
@@ -46,12 +52,27 @@ namespace thinking_box_12 {
         
         //color functions
 
-        //fill(color ccllt)
-        //stroke(color ccllt)
+        //ifill(color ccllt)
+        //istroke(color ccllt)
 
 
-        public void ellipse(int x, int y, float width, float height) {
+        public void fill(color ccllt) {
+            ifill = ccllt;
+        }
+
+        public void ellipse(int x, int y, int width, int height) {
+            if (dfill)
+            Raylib.DrawEllipse(x+(width/2), y+(height/2), width, height, ifill.get());
             
+            if (dstroke)
+            Raylib.DrawEllipseLines(x+(width/2), y+(height/2), width, height, istroke.get());
+        }
+
+
+
+
+        public void clear() {
+            Raylib.ClearBackground(ifill.get());
         }
     }
 
@@ -62,22 +83,39 @@ namespace thinking_box_12 {
             cllo = Raylib.ColorFromHSV(hue, saturation, value);
         }
 
+        // public color(int r, int b, int g) {
+        //     // cllo = Raylib.Graphics.Raylib.Color.rgb(r,g,b);
+        // }
+
+        public color(int colo) {
+            cllo = Raylib.GetColor((uint)colo);
+        }
+
+        public color(string hex) {
+            cllo = Raylib.GetColor((uint)(int.Parse(hex, NumberStyles.HexNumber)));
+        }
+
         public Color get() {
             return cllo;
         }
 
-        public vector3 from() {
-            // Raylib.Vector3 vlc = Raylib.ColorToHSV(cllo);
-
-            // return new vector3(vlc.x,vlc.y,vlc.z);
-            return new vector3(0,0,0);
+        public int from() {
+            return Raylib.ColorToInt(cllo);
         }  
+
+        public string fromhex() {
+            return (Raylib.ColorToInt(cllo)).ToString("x");
+        }
+
+        public vector3 fromhsv() {
+            return (new vector3(Raylib.ColorToHSV(cllo)));//new vector3(3,3,3);
+        }
     }
 
     public class vector3 {
-        double x;
-        double y;
-        double z;
+        public double x;
+        public double y;
+        public double z;
 
         public vector3(double x, double y, double z) {
             this.x = x;
@@ -97,16 +135,10 @@ namespace thinking_box_12 {
             this.z = (double)z;
         }
 
-        public double getx() {
-            return x;
-        }
-        
-        public double gety() {
-            return y;
-        }
-        
-        public double getz() {
-            return z;
+        public vector3(Vector3 vec) {
+            x = vec.X;
+            y = vec.Y;
+            z = vec.Z;
         }
 
         public string toString() {
